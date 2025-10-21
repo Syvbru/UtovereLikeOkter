@@ -119,6 +119,14 @@
       background: #e8f0fe;
       transition: 0.2s;
     }
+    
+    tr.striped-even {
+      background: #f1f5fa;
+    }
+
+    tr.striped-odd {
+      background: #ffffff;
+    }
 
     @media (max-width: 700px) {
       body { padding: 0.5rem; }
@@ -203,6 +211,7 @@
             <td>${r[3]}</td>
             <td>${athletes}</td>`;
           tbody.appendChild(tr);
+          restripeVisibleRows();
         });
       })
       .catch(err => {
@@ -211,22 +220,35 @@
       });
 
     // --- Søkefunksjon (flere navn med komma) ---
-    document.getElementById("searchName").addEventListener("input", e => {
-      const input = e.target.value.trim().toLowerCase();
-      const searchNames = input.split(",").map(n => n.trim()).filter(n => n.length > 0);
+document.getElementById("searchName").addEventListener("input", e => {
+  const input = e.target.value.trim().toLowerCase();
+  const searchNames = input.split(",").map(n => n.trim()).filter(n => n.length > 0);
+  const rows = document.querySelectorAll("#sessionTable tbody tr");
 
-      const rows = document.querySelectorAll("#sessionTable tbody tr");
-      rows.forEach(r => {
-        const utøvere = r.children[4].innerText.toLowerCase();
-        if (searchNames.length === 0) {
-          r.style.display = "";
-        } else {
-          // vis raden kun hvis ALLE navn finnes i utøverlisten
-          const match = searchNames.every(name => utøvere.includes(name));
-          r.style.display = match ? "" : "none";
-        }
-      });
-    });
+  // Filtrer rader
+  rows.forEach(r => {
+    const utøvere = r.children[4].innerText.toLowerCase();
+    if (searchNames.length === 0) {
+      r.style.display = "";
+    } else {
+      const match = searchNames.every(name => utøvere.includes(name));
+      r.style.display = match ? "" : "none";
+    }
+  });
+
+  // ➕ ReseStripe etter filtrering
+  restripeVisibleRows();
+});
+
+function restripeVisibleRows() {
+  const visibleRows = Array.from(document.querySelectorAll("#sessionTable tbody tr"))
+    .filter(r => r.style.display !== "none");
+  visibleRows.forEach((row, i) => {
+    row.classList.remove("striped-even", "striped-odd");
+    row.classList.add(i % 2 === 0 ? "striped-odd" : "striped-even");
+  });
+}
+
   </script>
 </body>
 </html>
