@@ -3,47 +3,196 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hvem har like økter</title>
+  <title>Fellesøkter</title>
   <style>
-    body { font-family: Arial, sans-serif; background:#f8f9fa; color:#333; margin:0; padding:20px; }
-    h1 { text-align:center; margin-bottom:10px; }
-    .searchbox { text-align:center; margin-bottom:20px; }
-    input { padding:6px; width:200px; border:1px solid #ccc; border-radius:6px; }
-    table { width:100%; border-collapse:collapse; }
-    th, td { border:1px solid #ccc; padding:8px; text-align:left; }
-    th { background:#007bff; color:#fff; }
-    tbody tr:nth-child(even) { background:#f2f2f2; }
+    :root {
+      --primary: #007bff;
+      --background: #f7f9fb;
+      --text: #333;
+      --white: #fff;
+      --border: #ddd;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, sans-serif;
+      background: var(--background);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.5rem;
+    }
+
+    h1 {
+      margin-top: 0.5rem;
+      font-weight: 600;
+      color: var(--primary);
+      text-align: center;
+    }
+
+    .search-container {
+      margin: 1.5rem 0;
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      justify-content: center;
+      position: sticky;
+      top: 0;
+      background: var(--background);
+      padding: 0.5rem 0;
+      z-index: 10;
+    }
+
+    #searchName {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 1rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      transition: all 0.2s ease-in-out;
+    }
+
+    #searchName:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 5px rgba(0,123,255,0.4);
+    }
+
+    .table-container {
+      width: 100%;
+      max-width: 1000px;
+      overflow-x: auto;
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: 12px;
+      overflow: hidden;
+      font-size: 0.95rem;
+    }
+
+    thead {
+      background: var(--primary);
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      white-space: nowrap;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #f1f5fa;
+    }
+
+    tbody tr:hover {
+      background: #e8f0fe;
+      transition: 0.2s;
+    }
+
+    @media (max-width: 700px) {
+      body {
+        padding: 0.5rem;
+      }
+
+      table {
+        font-size: 0.85rem;
+      }
+
+      th, td {
+        padding: 0.6rem;
+      }
+
+      #searchName {
+        font-size: 0.9rem;
+      }
+    }
+
+    footer {
+      margin-top: 1.5rem;
+      font-size: 0.8rem;
+      color: #666;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
-  <h1>Hvem har like økter?</h1>
+  <h1>Fellesøkter</h1>
 
-  <div class="searchbox">
-    <input type="text" id="searchName" placeholder="Søk etter navn...">
+  <div class="search-container">
+    <input type="text" id="searchName" placeholder="🔍 Søk etter navn...">
   </div>
 
-  <table id="sessionTable">
-    <thead>
-      <tr><th>Dag</th><th>Dato</th><th>Økt</th><th>Tid</th><th>Utøvere</th></tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div class="table-container">
+    <table id="sessionTable">
+      <thead>
+        <tr>
+          <th>Dag</th>
+          <th>Dato</th>
+          <th>Økt</th>
+          <th>Tid</th>
+          <th>Utøvere</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td colspan="5" style="text-align:center;">Laster inn data...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <footer>© 2025 Treningsoversikt – Automatisk generert</footer>
 
   <script>
-    // Les inn CSV automatisk fra samme mappe
+    // --- Hent CSV automatisk fra repoet ---
     fetch("felles_økter.csv")
-      .then(r => r.text())
+      .then(r => {
+        if (!r.ok) throw new Error("Kunne ikke hente CSV");
+        return r.text();
+      })
       .then(text => {
-        const rows = text.trim().split(/\r?\n/).map(l => l.split(/,(?=(?:(?:[^\"]*\"){2})*[^\"]*$)/).map(s => s.replace(/^\"|\"$/g,'')));
+        const rows = text.trim().split(/\r?\n/).map(line =>
+          line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/^"|"$/g, ""))
+        );
+
         const tbody = document.querySelector("#sessionTable tbody");
+        tbody.innerHTML = "";
+
+        if (rows.length <= 1) {
+          tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>Ingen data funnet.</td></tr>";
+          return;
+        }
+
         rows.slice(1).forEach(r => {
           const tr = document.createElement("tr");
-          tr.innerHTML = `<td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td>`;
+          tr.innerHTML = `
+            <td>${r[0]}</td>
+            <td>${r[1]}</td>
+            <td>${r[2]}</td>
+            <td>${r[3]}</td>
+            <td>${r[4]}</td>`;
           tbody.appendChild(tr);
         });
+      })
+      .catch(err => {
+        document.querySelector("#sessionTable tbody").innerHTML =
+          `<tr><td colspan="5" style="color:red;text-align:center;">Feil ved lasting av CSV: ${err.message}</td></tr>`;
       });
 
-    // Filter på navn
+    // --- Søkefunksjon ---
     document.getElementById("searchName").addEventListener("input", e => {
       const val = e.target.value.trim().toLowerCase();
       const rows = document.querySelectorAll("#sessionTable tbody tr");
