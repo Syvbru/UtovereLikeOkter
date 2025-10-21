@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fellesøkter</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f8f9fa; color:#333; margin:0; padding:20px; }
+    h1 { text-align:center; margin-bottom:10px; }
+    .searchbox { text-align:center; margin-bottom:20px; }
+    input { padding:6px; width:200px; border:1px solid #ccc; border-radius:6px; }
+    table { width:100%; border-collapse:collapse; }
+    th, td { border:1px solid #ccc; padding:8px; text-align:left; }
+    th { background:#007bff; color:#fff; }
+    tbody tr:nth-child(even) { background:#f2f2f2; }
+  </style>
+</head>
+<body>
+  <h1>Fellesøkter</h1>
+
+  <div class="searchbox">
+    <input type="text" id="searchName" placeholder="Søk etter navn...">
+  </div>
+
+  <table id="sessionTable">
+    <thead>
+      <tr><th>Dag</th><th>Dato</th><th>Økt</th><th>Tid</th><th>Utøvere</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    // Les inn CSV automatisk fra samme mappe
+    fetch("felles_økter.csv")
+      .then(r => r.text())
+      .then(text => {
+        const rows = text.trim().split(/\r?\n/).map(l => l.split(/,(?=(?:(?:[^\"]*\"){2})*[^\"]*$)/).map(s => s.replace(/^\"|\"$/g,'')));
+        const tbody = document.querySelector("#sessionTable tbody");
+        rows.slice(1).forEach(r => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td>`;
+          tbody.appendChild(tr);
+        });
+      });
+
+    // Filter på navn
+    document.getElementById("searchName").addEventListener("input", e => {
+      const val = e.target.value.trim().toLowerCase();
+      const rows = document.querySelectorAll("#sessionTable tbody tr");
+      rows.forEach(r => {
+        const utøvere = r.children[4].innerText.toLowerCase();
+        r.style.display = (!val || utøvere.includes(val)) ? "" : "none";
+      });
+    });
+  </script>
+</body>
+</html>
