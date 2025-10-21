@@ -34,6 +34,11 @@
       color: var(--primary);
       text-align: center;
     }
+    h2{
+      font-weight: 400;
+      color: var(--primary);
+      text-align: center;
+    }
 
     .search-container {
       margin: 1.5rem 0;
@@ -104,6 +109,23 @@
       transition: 0.2s;
     }
 
+    table td, table th {
+      font-size: 0.95rem;
+      line-height: 1.4;
+      vertical-align: top;
+    }
+    
+    td:last-child {
+      white-space: normal;
+      word-wrap: break-word;
+      max-width: 250px;
+    }
+    
+    html {
+      -webkit-text-size-adjust: 100%;
+    }
+
+
     @media (max-width: 700px) {
       body {
         padding: 0.5rem;
@@ -120,6 +142,9 @@
       #searchName {
         font-size: 0.9rem;
       }
+      td:last-child {
+        font-size: 0.85rem;
+      }
     }
 
     footer {
@@ -131,7 +156,8 @@
   </style>
 </head>
 <body>
-  <h1>Fellesøkter</h1>
+  <h1>Utøvere søkekatalog</h1>
+  <h3> Hvem har like økter som meg?</h3>
 
   <div class="search-container">
     <input type="text" id="searchName" placeholder="🔍 Søk etter navn...">
@@ -154,7 +180,7 @@
     </table>
   </div>
 
-  <footer>© 2025 Treningsoversikt – Automatisk generert</footer>
+  <footer>© Søkekatalog for utøvere – Syver Brustad </footer>
 
   <script>
     // --- Hent CSV automatisk fra repoet ---
