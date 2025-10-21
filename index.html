@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fellesøkter</title>
+  <title> Utøvere Søkekatalog</title>
   <style>
     :root {
       --primary: #007bff;
@@ -31,6 +31,11 @@
     h1 {
       margin-top: 0.5rem;
       font-weight: 600;
+      color: var(--primary);
+      text-align: center;
+    }
+    h2{
+      font-weight: 400;
       color: var(--primary);
       text-align: center;
     }
@@ -143,7 +148,8 @@
   </style>
 </head>
 <body>
-  <h1>Fellesøkter</h1>
+  <h1>Utøvere Søkekatalog </h1>
+  <h2> Hvem har like økter som meg? </h2>
 
   <div class="search-container">
     <input type="text" id="searchName" placeholder="🔍 Søk etter navn (eks: Ola, Kari)">
@@ -166,7 +172,7 @@
     </table>
   </div>
 
-  <footer>© 2025 Treningsoversikt – Automatisk generert</footer>
+  <footer>© Søkekatalog for utøvere – Syver Brustad </footer>
 
   <script>
     // --- Hent CSV automatisk fra repoet ---
